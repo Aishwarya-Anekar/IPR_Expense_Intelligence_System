@@ -6,11 +6,14 @@ import { useTransactions } from '../context/TransactionContext';
 import styles from './QR.module.css';
 
 export default function QR() {
-  const { currentUser } = useAuth();
+  const { currentUser, verifyPin } = useAuth();
   const { mlPredict, addTransaction } = useTransactions();
   const [upiInput, setUpiInput] = useState('');
   const [amtInput, setAmtInput] = useState('');
+  const [pinInput, setPinInput] = useState('');
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [processing, setProcessing] = useState(false);
   const qrRef = useRef(null);
 
   const upiId = currentUser?.upi || 'user@paysmart';
@@ -31,29 +34,63 @@ export default function QR() {
     setUpiInput(sample.upi);
     setAmtInput(sample.amt);
     setSuccess(false);
+    setError('');
   }
 
   function downloadQr() {
-    const canvas = qrRef.current?.querySelector('canvas');
-    if (!canvas) return;
-
+    const svg = qrRef.current?.querySelector('svg');
+    if (!svg) return;
+    const source = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.download = 'paysmart-qr.png';
-    link.href = canvas.toDataURL('image/png');
+    link.download = 'paysmart-qr.svg';
+    link.href = url;
+    document.body.appendChild(link);
     link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
   async function pay() {
-    if (!upiInput || !amtInput) return alert('Enter UPI ID and amount');
-    const merchant = upiInput.split('@')[0];
-    const pred = await mlPredict(merchant, Number(amtInput) || 0);
-    await addTransaction(merchant, parseFloat(amtInput), pred.category, pred.confidence);
-    setSuccess(true);
-    setTimeout(() => {
-      setSuccess(false);
+    const amount = Number(amtInput);
+    const recipientUpi = upiInput.trim().toLowerCase();
+    if (!recipientUpi || !recipientUpi.includes('@') || recipientUpi.includes(' ')) {
+      setError('Enter a valid recipient UPI ID.');
+      return;
+    }
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setError('Enter an amount greater than zero.');
+      return;
+    }
+    if (!/^\d{4}$/.test(pinInput)) {
+      setError('Enter your 4-digit UPI PIN.');
+      return;
+    }
+    if (recipientUpi === currentUser?.upi?.toLowerCase()) {
+      setError('You cannot pay your own UPI ID.');
+      return;
+    }
+
+    setProcessing(true);
+    setError('');
+    setSuccess(false);
+    try {
+      if (!(await verifyPin(pinInput))) {
+        throw new Error('Incorrect UPI PIN.');
+      }
+      const merchant = recipientUpi.split('@')[0];
+      const pred = await mlPredict(merchant, amount);
+      await addTransaction(merchant, amount, pred.category, pred.confidence, recipientUpi, false);
+      setSuccess(true);
       setUpiInput('');
       setAmtInput('');
-    }, 2500);
+      setPinInput('');
+    } catch (paymentError) {
+      setError(paymentError.message || 'Payment failed. Please try again.');
+    } finally {
+      setProcessing(false);
+    }
   }
 
   return (
@@ -81,7 +118,8 @@ export default function QR() {
 
         <div className={styles.card}>
           <div className={styles.cardTitle}>Scan & Pay</div>
-          {success && <div className={styles.successBanner}>✅ Payment Successful! Auto-categorized by ML</div>}
+          {success && <div className={styles.successBanner}>✅ Payment successful and recorded</div>}
+          {error && <div className={styles.errorBanner}>{error}</div>}
           <div className={styles.scanArea} onClick={simulateScan}>
             <span className={styles.scanIcon}>📷</span>
             <p className={styles.scanText}>Click to simulate QR scan</p>
@@ -94,9 +132,13 @@ export default function QR() {
           </div>
           <div className={styles.formGroup}>
             <label className={styles.label}>Amount (₹)</label>
-            <input className={styles.input} type="number" placeholder="0.00" value={amtInput} onChange={e => setAmtInput(e.target.value)} />
+            <input className={styles.input} type="number" min="0.01" step="0.01" placeholder="0.00" value={amtInput} onChange={e => { setAmtInput(e.target.value); setError(''); }} />
           </div>
-          <button className={styles.btn} onClick={pay}>Pay via UPI →</button>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>UPI PIN</label>
+            <input className={styles.input} type="password" inputMode="numeric" maxLength={4} placeholder="4-digit PIN" value={pinInput} onChange={e => { setPinInput(e.target.value.replace(/\D/g, '')); setError(''); }} />
+          </div>
+          <button className={styles.btn} onClick={pay} disabled={processing}>{processing ? 'Processing...' : 'Pay via UPI →'}</button>
         </div>
       </div>
     </div>

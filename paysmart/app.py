@@ -618,7 +618,14 @@ def get_transactions(user_id):
         'confidence': r['confidence'], 'date': r['date']
     } for r in rows]
 
-    return jsonify({'transactions': txns, 'total': len(txns)})
+    conn = get_db()
+    user = conn.execute('SELECT balance FROM users WHERE id=?', (user_id,)).fetchone()
+    conn.close()
+    return jsonify({
+        'transactions': txns,
+        'total': len(txns),
+        'balance': float(user['balance']) if user else 0,
+    })
 
 
 @app.route('/users/lookup', methods=['POST'])
@@ -715,6 +722,7 @@ def transfer_funds():
         return jsonify({
             'success': True,
             'transfer_id': conn.execute('SELECT last_insert_rowid() AS id').fetchone()['id'] if False else None,
+            'balance': float(updated_payer['balance']),
             'payer_balance': float(updated_payer['balance']),
             'recipient_balance': float(updated_recipient['balance']),
             'recipient': {

@@ -39,7 +39,7 @@ function saveLimits(limits) {
 export function TransactionProvider({ children, userId }) {
   const { apiFetch } = useAuth();
   const [transactions,   setTransactions]   = useState([]);
-  const [balance,        setBalance]        = useState(0);
+  const [balance,        setBalance]        = useState(null);
   const [loading,        setLoading]        = useState(false);
   // ── Limits persisted to localStorage per month — survive page refresh
   const [categoryLimits, setCategoryLimits] = useState(() => loadLimits());
@@ -95,7 +95,7 @@ export function TransactionProvider({ children, userId }) {
     }));
 
   useEffect(() => {
-    if (!userId) { setTransactions([]); setBalance(0); return; }
+    if (!userId) { setTransactions([]); setBalance(null); return; }
     fetchTransactions();
   }, [userId]);
 
@@ -104,6 +104,11 @@ export function TransactionProvider({ children, userId }) {
     try {
       const res  = await apiFetch(`/transactions/${userId}`);
       const data = await res.json();
+      if (!res.ok) {
+        const error = new Error(data.error || 'Could not load transactions');
+        error.status = res.status;
+        throw error;
+      }
       const formatted = (data.transactions || []).map(t => ({
         ...t,
         time: new Date(t.date).toLocaleString('en-IN', {
@@ -112,6 +117,7 @@ export function TransactionProvider({ children, userId }) {
         conf: t.confidence,
       }));
       setTransactions(formatted);
+      if (typeof data.balance === 'number') setBalance(data.balance);
     } catch (e) {
       // Demo mode fallback — seed multi-month transactions so Monthly Trend chart shows real data
       const now = new Date();
@@ -184,15 +190,20 @@ export function TransactionProvider({ children, userId }) {
     return { category: 'Other', confidence: 62 };
   }
 
-  async function addTransaction(merchant, amount, category, conf, recipientUpi = null) {
+  async function addTransaction(merchant, amount, category, conf, recipientUpi = null, allowOfflineFallback = true) {
     try {
       const res  = await apiFetch('/transactions', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ user_id: userId, merchant, amount, category, confidence: conf, recipient_upi: recipientUpi })
       });
       const data = await res.json();
+      if (!res.ok) {
+        const error = new Error(data.error || 'Payment failed');
+        error.status = res.status;
+        throw error;
+      }
       if (data.success) {
-        setBalance(data.balance);
+        setBalance(data.balance ?? data.payer_balance);
         const newTxn = {
           id: Date.now(), merchant, amount, category, conf, date: new Date(),
           time: new Date().toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })
@@ -200,8 +211,11 @@ export function TransactionProvider({ children, userId }) {
         setTransactions(prev => [newTxn, ...prev]);
         return newTxn;
       }
+      throw new Error('Payment was not completed');
     } catch (e) {
-      // Demo fallback
+      if (e.status || !allowOfflineFallback) throw e;
+
+      // Preserve offline demo behavior only when the API cannot be reached.
       const newTxn = {
         id: Date.now(), merchant, amount, category, conf, date: new Date(),
         time: new Date().toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })

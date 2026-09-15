@@ -8,7 +8,7 @@ const DEMO_PIN   = '1234';
 const MONTH_NAME = new Date().toLocaleString('en-IN', { month:'long', year:'numeric' });
 
 export default function Home({ onNavigate }) {
-  const { currentUser }                                     = useAuth();
+  const { currentUser, verifyPin }                          = useAuth();
   const { transactions, balance,
           exceededCategories, warningCategories, catSpend } = useTransactions();
 
@@ -19,7 +19,7 @@ export default function Home({ onNavigate }) {
   // dismiss individual alerts
   const [dismissed, setDismissed] = useState(new Set());
 
-  const displayBalance = balance || currentUser?.balance || 0;
+  const displayBalance = balance ?? currentUser?.balance ?? 0;
   const hour     = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const today    = new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
@@ -44,9 +44,14 @@ export default function Home({ onNavigate }) {
 
   function dismiss(key) { setDismissed(prev => new Set([...prev, key])); }
 
-  function checkBalancePin() {
-    if (verifyPin(balancePin)) { setBalancePinError(''); setBalanceRevealed(true); }
-    else { setBalancePinError('❌ Incorrect UPI PIN. Please try again.'); setBalancePin(''); }
+  async function checkBalancePin() {
+    try {
+      const valid = await verifyPin(balancePin);
+      if (valid) { setBalancePinError(''); setBalanceRevealed(true); }
+      else { setBalancePinError('❌ Incorrect UPI PIN. Please try again.'); setBalancePin(''); }
+    } catch {
+      setBalancePinError('Could not verify PIN. Please try again.');
+    }
   }
   function closeBalance() { setShowBalanceModal(false); setBalancePin(''); setBalancePinError(''); setBalanceRevealed(false); }
   function openBalance()  { setBalanceRevealed(false); setBalancePin(''); setBalancePinError(''); setShowBalanceModal(true); }
