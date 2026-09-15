@@ -1,0 +1,29 @@
+# Python
+paysmart/.venv/
+.venv/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Local application data and secrets
+paysmart/paysmart.db
+paysmart/*.db-wal
+paysmart/*.db-shm
+.env
+.env.*
+!.env.example
+
+# Generated ML and frontend output
+paysmart/model.pkl
+paysmart/build/
+paysmart/node_modules/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

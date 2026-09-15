@@ -1,0 +1,58 @@
+/* src/pages/Dashboard.module.css */
+.page { animation: fadeUp 0.35s ease; }
+.header { margin-bottom: 28px; }
+.header h1 { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -.8px; }
+.header p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+.alert { border: 1px solid; border-radius: var(--radius-lg); padding: 18px 22px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; font-size: 14px; line-height: 1.5; font-weight: 500; }
+.alertIcon { font-size: 24px; flex-shrink: 0; }
+
+.statsGrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+.statCard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; position: relative; overflow: hidden; transition: all .25s; }
+.statCard::after { content: ''; position: absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, var(--accent), transparent); }
+.statCard:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,.3); }
+.statIcon { font-size: 26px; margin-bottom: 12px; }
+.statValue { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+.statLabel { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.statChange { font-size: 12px; margin-top: 8px; font-weight: 600; }
+.up { color: var(--accent2); }
+.down { color: var(--accent3); }
+
+.chartsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.chartCard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; }
+.chartTitle { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 22px; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; }
+.cardTitle { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+.budgetList { display: flex; flex-direction: column; gap: 18px; }
+.budgetItem {}
+.budgetHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+.budgetCat { font-size: 14px; font-weight: 600; }
+.budgetAmts { font-size: 12px; font-weight: 500; }
+.budgetBar { height: 6px; background: var(--surface2); border-radius: 10px; overflow: hidden; }
+.budgetFill { height: 100%; border-radius: 10px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+
+@media(max-width:900px){
+  .statsGrid { grid-template-columns: 1fr 1fr; }
+  .chartsGrid { grid-template-columns: 1fr; }
+}
+@media(max-width:600px){ .statsGrid { grid-template-columns: 1fr; } }
+
+/* User-set category limit tracker */
+.limitList    { display: flex; flex-direction: column; gap: 16px; }
+.limitItem    { padding: 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-lg); transition: border-color .2s; }
+.limitItem:hover { border-color: var(--border2); }
+.limitHeader  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.limitCat     { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.limitCatIcon { font-size: 18px; }
+.limitAmts    { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
+.limitBarBg   { height: 8px; background: var(--surface3); border-radius: 10px; overflow: hidden; margin-bottom: 8px; }
+.limitBarFill { height: 100%; border-radius: 10px; transition: width 1s ease, background .3s; }
+.limitFooter  { display: flex; justify-content: space-between; align-items: center; }
+
+/* Empty state when no limits set */
+.noLimitsCard { background: var(--surface); border: 1px dashed var(--border2); border-radius: var(--radius-lg); padding: 40px; text-align: center; margin-top: 4px; }
+.noLimitsIcon  { font-size: 44px; margin-bottom: 12px; }
+.noLimitsTitle { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.noLimitsSub   { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 380px; margin: 0 auto; }
+.noLimitsSub strong { color: var(--accent); }

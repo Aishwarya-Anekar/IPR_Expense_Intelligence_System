@@ -1,0 +1,26 @@
+/* src/pages/QR.module.css */
+.page { animation: fadeUp 0.35s ease; }
+.header { margin-bottom: 28px; }
+.header h1 { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -.8px; }
+.header p { color: var(--muted); font-size: 14px; margin-top: 6px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; }
+.cardTitle { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+.qrBox { width: 200px; height: 200px; margin: 0 auto 20px; background: #fff; border-radius: var(--radius-lg); padding: 14px; box-shadow: 0 20px 60px rgba(124,109,250,.35), 0 0 0 6px rgba(124,109,250,.1); }
+.qrBox svg { width: 100%; height: 100%; }
+.upiId { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 20px; }
+.successBanner { background: rgba(50,213,131,.1); border: 1px solid rgba(50,213,131,.3); color: var(--accent3); border-radius: var(--radius); padding: 12px 16px; font-size: 13px; margin-bottom: 16px; font-weight: 600; }
+.scanArea { border: 2px dashed var(--border2); border-radius: var(--radius-lg); padding: 40px 24px; text-align: center; cursor: pointer; transition: all .25s; }
+.scanArea:hover { border-color: var(--accent); background: rgba(124,109,250,.05); }
+.scanIcon { font-size: 48px; margin-bottom: 12px; display: block; }
+.scanText { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.scanSub { font-size: 12px; color: var(--muted); }
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+.formGroup { margin-bottom: 16px; }
+.label { font-size: 11px; color: var(--muted); margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.input { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 13px 16px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: all .2s; }
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(124,109,250,.1); }
+.input::placeholder { color: var(--muted); }
+.btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--accent), #9b5de5); border: none; border-radius: var(--radius); color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .25s; box-shadow: 0 6px 20px rgba(124,109,250,.3); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,109,250,.45); }
+@media(max-width:900px){.grid{grid-template-columns:1fr;}}

@@ -1,0 +1,66 @@
+/* ============================================================
+   PaySmart Global Styles
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg:          #070711;
+  --surface:     #11111f;
+  --surface2:    #181828;
+  --surface3:    #1e1e32;
+  --border:      rgba(255,255,255,0.06);
+  --border2:     rgba(255,255,255,0.12);
+  --accent:      #7c6dfa;
+  --accent2:     #f95f7a;
+  --accent3:     #32d583;
+  --accent4:     #fbb040;
+  --accent5:     #38bdf8;
+  --text:        #eeeeff;
+  --text2:       #b0b0d0;
+  --muted:       #6060a0;
+  --radius-sm:   10px;
+  --radius:      16px;
+  --radius-lg:   24px;
+  --radius-xl:   32px;
+  --shadow:      0 8px 32px rgba(0,0,0,0.4);
+  --shadow-accent: 0 8px 32px rgba(124,109,250,0.3);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes orb-float {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50%      { transform: translate(30px,-30px) scale(1.05); }
+}
+@keyframes pop {
+  0%  { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100%{ transform: scale(1); }
+}
+@keyframes shake {
+  0%,100%{ transform: translateX(0); }
+  20%,60%{ transform: translateX(-6px); }
+  40%,80%{ transform: translateX(6px); }
+}
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(100%); }
+  to   { opacity:1; transform:translateY(0); }
+}

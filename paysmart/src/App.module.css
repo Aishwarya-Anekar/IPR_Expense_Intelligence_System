@@ -1,0 +1,7 @@
+/* src/App.module.css */
+.app { display: flex; min-height: 100vh; }
+.main { margin-left: 76px; flex: 1; padding: 36px 40px; min-height: 100vh; }
+
+@media(max-width:600px){
+  .main { margin-left: 0; padding: 20px 16px; }
+}
